@@ -1,0 +1,30 @@
+# device.conf — this simulator's stand-in for Teltonika Configurator.
+#
+# Every key marked with a param number is a REAL Teltonika Configurator
+# parameter. Setting it here is the same act as setting it on the physical
+# device, which is the point: the ritual transfers.
+
+# ── Identity (burned in at the factory; you cannot change this on real hardware)
+device.imei          = 356307042441013
+device.codec         = 8E          # 8 or 8E. Real FMC firmware defaults to 8E
+
+# ── Where to send data. A unit with these unset sends NOTHING. (params 2004-2006)
+server.host          = 127.0.0.1
+server.port          = 5027        # Traccar's Teltonika port. Our own ingest: 5027
+server.protocol      = TCP         # UDP exists on real units; not simulated here
+
+# ── APN (params 2001-2003). Not simulated — recorded so the checklist is complete.
+# On real hardware a wrong APN means the unit never reaches the internet at all,
+# and the symptom is identical to a wrong server address: silence.
+apn.name             = internet
+apn.username         =
+apn.password         =
+
+# ── Sending behaviour
+records.sendPeriodMs = 1000
+records.perPacket    = 1           # raise this to see real batching + a bigger ACK
+buffer.enabled       = true        # hold unacked records, resend after reconnect
+buffer.maxRecords    = 1000
+
+# ── Which built-in movement story to drive. `npx teltonika-sim scenarios` lists all.
+scenario             = day-cycle

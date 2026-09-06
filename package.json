@@ -1,0 +1,48 @@
+{
+  "name": "teltonika-device-sim",
+  "version": "1.0.0",
+  "description": "A Teltonika FMC-series GPS tracker simulator that speaks the real Codec 8 / 8E wire protocol over TCP. Handshakes, ACK-gated buffering, and the full device provisioning ritual — so it fails the way real hardware fails.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "teltonika-sim": "src/cli/sim.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./codec": "./src/protocol/codec.js",
+    "./device": "./src/device.js",
+    "./buffered-device": "./src/buffered-device.js",
+    "./scenarios": "./src/scenarios.js",
+    "./imei": "./src/imei.js",
+    "./avl-io": "./src/avl-io.js",
+    "./config": "./src/device-config.js"
+  },
+  "files": [
+    "src",
+    "docs",
+    "README.md",
+    "device.conf.example"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "sim": "node src/cli/sim.js",
+    "compare": "node src/cli/compare.js"
+  },
+  "keywords": [
+    "teltonika",
+    "codec8",
+    "codec8e",
+    "gps",
+    "telematics",
+    "avl",
+    "simulator",
+    "traccar",
+    "fmc130"
+  ],
+  "dependencies": {}
+}
