@@ -502,6 +502,8 @@ Codec 8 / 8E wire protocol over TCP.
   npx teltonika-sim scenarios    list the built-in movement stories
   npx teltonika-sim compare      send the same bytes to Traccar AND our ingest,
                                  then diff what each one decoded
+  npx teltonika-sim panel        browser scenario picker — same stream code,
+                                 a Run button instead of flags, live wire log
 
 Flags override device.conf without editing it:
   --config <path>  --host  --port  --imei  --codec  --scenario
@@ -529,6 +531,12 @@ const COMMANDS = {
   compare: async () => {
     const { compare } = await import('./compare.js');
     return compare(process.argv.slice(3));
+  },
+  // panel has its own flag vocabulary (--port/--host for the panel's OWN http
+  // server, not the target device), same reason as compare above.
+  panel: async () => {
+    const { panel } = await import('./panel.js');
+    return panel(process.argv.slice(3));
   },
   help: cmdHelp,
 };

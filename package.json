@@ -1,7 +1,7 @@
 {
   "name": "teltonika-device-sim",
   "version": "1.0.0",
-  "description": "A Teltonika FMC-series GPS tracker simulator that speaks the real Codec 8 / 8E wire protocol over TCP. Handshakes, ACK-gated buffering, and the full device provisioning ritual — so it fails the way real hardware fails.",
+  "description": "A Teltonika FMC-series GPS tracker simulator that speaks the real Codec 8 / 8E wire protocol over TCP. Handshakes, ACK-gated buffering, and the full device provisioning ritual \u2014 so it fails the way real hardware fails.",
   "type": "module",
   "license": "UNLICENSED",
   "private": true,
@@ -31,7 +31,8 @@
   "scripts": {
     "test": "node --test \"test/*.test.js\"",
     "sim": "node src/cli/sim.js",
-    "compare": "node src/cli/compare.js"
+    "compare": "node src/cli/compare.js",
+    "panel": "node src/cli/panel.js"
   },
   "keywords": [
     "teltonika",

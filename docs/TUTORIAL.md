@@ -305,12 +305,11 @@ mature, widely-deployed, independent GPS platform. If it decodes our bytes, we
 are speaking real Teltonika, not a protocol we invented and then wrote a
 decoder for.
 
-> **You have to run this part yourself.** It was not run when this tutorial
-> was written — the authoring sandbox had no Docker and a blocked registry.
-> Everything below is correct to the best of our knowledge, and the compare
-> tool in part 7 self-checks its own parsing against a fixture, but **the
-> Traccar column is unverified until you verify it.** If something here does
-> not match what you see, trust Traccar and fix this document.
+> **Verified 2026-09-07 against Traccar 6.6** (installed from the official
+> release zip, not Docker, in a sandbox with no Docker registry access — same
+> commands, different install method). Handshake, streaming, and ACKs all
+> matched this section exactly. **One thing below is now out of date — see the
+> callout after the "Sit with that" paragraph.**
 
 ```bash
 docker run -d --name traccar \
@@ -354,8 +353,9 @@ the device's latest position and look at its attribute list. You will find
 `ignition` and `motion` as named, typed fields. Now look for engine hours.
 
 You will find `io102` — an untyped attribute with a raw number, no unit, no
-name, no meaning. Traccar has named decoders for AVL 239 (ignition) and 240
-(movement). It does not have one for 102, 103 or 449, because those are
+name, no meaning, incrementing 1-per-minute exactly like our own AVL102
+output. Traccar has named decoders for AVL 239 (ignition) and 240 (movement).
+It does not have a *named* one for 102, 103 or 449, because those are
 CAN-derived and machine-specific — there is no universal mapping to give.
 
 Sit with that for a moment. **Traccar cannot validate the one parameter our
@@ -363,6 +363,22 @@ billing depends on.** It is not a shortcoming in Traccar; it is the honest
 state of the ecosystem. The independent oracle we just used to prove our wire
 format is correct has *nothing to say* about the number we invoice from. That
 gap is the finding, and part 7 puts it on screen.
+
+> **Update, verified against Traccar 6.6:** Traccar *also* now writes a
+> second, typed attribute called `hours` alongside the raw `io102`. Do not
+> mistake it for a decode of AVL102. Watch it across a `day-cycle` run and
+> you'll see it start at `null` on the first position, then increase in
+> fixed 60000ms (1-minute) steps from there — it is `(current io102 − io102
+> at the first position Traccar ever saw for this device) × 60000`, i.e. a
+> **relative delta seeded at first contact**, not the absolute engine-hour
+> meter `io102` carries. It also does not go absent when ignition drops and
+> `io102` disappears from the wire — it freezes at its last value instead of
+> reporting unknown. Both behaviours are exactly the kind of thing Rule 2
+> (absent is not zero) and invariant 5 (a tracker-side accumulator is not
+> billing evidence) exist to catch: if `hours` were ever wired into an
+> invoice, a device re-registered on a fresh Traccar instance would silently
+> reset its billable hours to zero. File this as a Stage-3 finding — it's a
+> real one, not a hypothetical.
 
 ---
 
