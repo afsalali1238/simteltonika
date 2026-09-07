@@ -28,6 +28,16 @@ Traccar (step 3) comes *before* `connect` (step 5), not after. Running
 common confusing failure: it just times out or refuses, with no clue why,
 because there is nothing on the other end yet.
 
+> **This is meant to be typed and run by hand, one command at a time —
+> not auto-executed end to end.** The point is to see what each step
+> actually does: watch Docker pull and start Traccar, watch the handshake
+> get accepted, watch the map update. If you're using an AI coding tool to
+> help you through this, ask it to walk you through the steps one at a time
+> and explain each one, rather than asking it to "run it" and do everything
+> for you — you'll learn the protocol and the platform this way, which is
+> the actual point of this repo. Run each command yourself, read its output,
+> and only move to the next step once you understand what happened.
+
 ### 1. Prerequisites
 
 ```bash
