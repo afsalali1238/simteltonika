@@ -28,15 +28,33 @@ Traccar (step 3) comes *before* `connect` (step 5), not after. Running
 common confusing failure: it just times out or refuses, with no clue why,
 because there is nothing on the other end yet.
 
-> **This is meant to be typed and run by hand, one command at a time —
-> not auto-executed end to end.** The point is to see what each step
-> actually does: watch Docker pull and start Traccar, watch the handshake
-> get accepted, watch the map update. If you're using an AI coding tool to
-> help you through this, ask it to walk you through the steps one at a time
-> and explain each one, rather than asking it to "run it" and do everything
-> for you — you'll learn the protocol and the platform this way, which is
-> the actual point of this repo. Run each command yourself, read its output,
-> and only move to the next step once you understand what happened.
+> **Rules for anyone (or any AI tool) working through this — not
+> suggestions, requirements:**
+>
+> 1. **The receiver is Traccar (step 3), run in Docker. Do not substitute
+>    a mock server, a stub TCP listener, or any hand-written "ingest"
+>    script.** Writing your own receiver instead of using Traccar proves
+>    nothing about this simulator's actual purpose — the whole point is
+>    watching a real, independent, third-party platform decode the bytes.
+> 2. **Do every step, in order, 1 through 7. Do not skip Docker/Traccar
+>    and jump to `connect` or `stream`.** Step 5 (`connect`) will hang or
+>    refuse if step 3 hasn't happened yet — that is expected, not a bug
+>    to work around by inventing a different receiver.
+> 3. **Run one command, show the output, stop and wait — do not chain
+>    all the steps together and report a final summary.** If you are an
+>    AI coding assistant reading this on someone's behalf: execute step 1,
+>    show them what happened, then stop. Wait for them to say "go on"
+>    before step 2. Repeat through step 7. Do not run steps 2-7 in one
+>    uninterrupted burst even if you technically can — the person using
+>    this repo is meant to see Docker pull the image, see the handshake
+>    get accepted, and see the marker move on the Traccar map with their
+>    own eyes, not read about it after the fact in a summary.
+> 4. **If something fails, stop and read the Troubleshooting table below
+>    before trying anything else — don't work around a failure by
+>    changing the approach** (e.g. writing a mock server because Traccar
+>    didn't start, or skipping the handshake check because it timed out).
+>    A failure at any step is informative; papering over it defeats the
+>    purpose of the exercise.
 
 ### 1. Prerequisites
 
