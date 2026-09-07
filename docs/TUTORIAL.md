@@ -344,6 +344,13 @@ npx teltonika-sim connect --host 127.0.0.1 --port 5027
 npx teltonika-sim stream  --host 127.0.0.1 --port 5027
 ```
 
+> Prefer clicking to typing flags? `npx teltonika-sim panel` opens a browser
+> page with the same target fields, a scenario dropdown, and a Run button —
+> same BufferedDevice + buildScenario() code underneath, so the bytes are
+> identical to what `stream` sends. It doesn't draw a map of its own; keep
+> the Traccar tab open next to it. See the README's "Try it against Traccar,
+> with a browser panel" section for the full click-through.
+
 Then look at the Traccar map. You should see the device online, moving, with
 speed and ignition state — decoded from the exact same bytes our own receiver
 decoded a moment ago.

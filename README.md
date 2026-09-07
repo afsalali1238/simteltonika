@@ -35,6 +35,111 @@ Traccar, and it is written to be worked through rather than skimmed.
 
 ---
 
+## Try it against Traccar, with a browser panel
+
+This is the full path from nothing installed to watching a simulated machine
+move on a real, independent GPS platform's map — no hardware, no SIM card.
+Everything here also works from the CLI one flag at a time (see `docs/TUTORIAL.md`
+§5); this is the same thing with a Run button.
+
+### 0. Prerequisites
+
+- **Node.js ≥ 20** — `node --version`
+- **Docker Desktop**, running — `docker --version`
+
+Nothing else. This package has zero dependencies.
+
+### 1. Install and prove it works
+
+```bash
+git clone https://github.com/afsalali1238/simteltonika.git
+cd simteltonika
+npm test
+```
+
+Expect `# pass 113`, `# fail 0`, `# skipped 0`.
+
+### 2. Start Traccar
+
+```bash
+docker run -d --name traccar -p 8082:8082 -p 5027:5027 traccar/traccar:latest
+```
+
+First run downloads the image — wait for `docker ps` to show `traccar` with
+status `Up ...` and both ports listed before continuing. Then open
+`http://localhost:8082`.
+
+**First visit only:** there's no account yet. Fill in any name/email and a
+password — the first account created on a fresh install becomes admin
+automatically.
+
+- **8082** — Traccar's web UI.
+- **5027** — Traccar's Teltonika listener. This is also the conventional
+  Teltonika port, which is why this package's own test ingest (used by
+  `compare`) defaults somewhere else — see `docs/TUTORIAL.md` §7.
+
+### 3. Register the device
+
+Traccar only accepts data from IMEIs it already knows. An unregistered device
+completes the TCP handshake and then Traccar silently discards everything that
+follows — no error, no red light, just an empty map. This step is the one
+everyone forgets and then blames the simulator for.
+
+1. In Traccar: **Settings → Devices → +**
+2. **Name:** anything, e.g. `D1 Excavator X`
+3. **Identifier:** `356307042441013` — must match exactly. This is the IMEI
+   `npx teltonika-sim init` writes into `device.conf` by default.
+4. Save.
+
+(Registering `356307042441099` too lets you also run the `yard-idle` and
+`dic-to-reem` scenarios, which use device **D2** instead of D1 — see
+`npx teltonika-sim scenarios` for the full roster.)
+
+### 4. Start the panel
+
+```bash
+npx teltonika-sim init      # writes device.conf if you don't have one yet
+npx teltonika-sim panel
+```
+
+Open `http://127.0.0.1:4173`. Keep the Traccar tab open alongside it — the
+panel does not draw its own map, Traccar already does that job.
+
+### 5. Run a scenario
+
+The **target** fields are pre-filled from `device.conf` (host `127.0.0.1`,
+port `5027`, the D1 IMEI, codec `8E`) — that already points at the Traccar
+you just started. Pick a scenario from the dropdown (the box underneath shows
+what it proves and which device(s) it uses), choose a pace, and click **Run**.
+
+Watch the log panel: handshake accepted, then every record sent with its
+ACK. Flip to the Traccar tab (refresh if needed) — the device goes from
+**Offline** to **Online**, with a moving marker and live speed/ignition state,
+decoded by Traccar's own independent implementation from the exact bytes the
+panel just sent.
+
+### 6. What to actually look at
+
+Click the device's position for details, then look for `io102` in its
+attribute list. It's engine hours (AVL 102, minutes) — and it's a bare,
+unlabelled number, because Traccar has no named decoder for a CAN-derived,
+machine-specific parameter. That gap — the one parameter billing depends on
+being the one thing the independent platform can't validate — is the actual
+point of this whole exercise. `docs/TUTORIAL.md` §5 and §7 go through it, and
+through the `hours` attribute Traccar derives nearby (which is **not** a
+decode of `io102` — read that section before trusting it).
+
+### Troubleshooting
+
+| Symptom | Cause |
+|---|---|
+| Panel shows "no connection... is the receiver running?" | Traccar isn't up yet, or the port is wrong. Check `docker ps`. |
+| Panel shows "handshake REJECTED (0x00)" | The IMEI isn't registered on Traccar, or doesn't match exactly. Redo step 3. |
+| Device stays "Offline" in Traccar after a run that showed ACKs | You're looking at the wrong device row, or registered the IMEI with a typo. |
+| `docker run` fails with "port is already allocated" | Something else is already using 8082 or 5027 — stop it, or map different host ports and adjust `device.conf` / the panel's target fields to match. |
+
+---
+
 ## Commands
 
 | Command | Real-world equivalent |
@@ -47,6 +152,7 @@ Traccar, and it is written to be worked through rather than skimmed.
 | `drill <name>` | Reproduce a named real-world fault |
 | `scenarios` | List the built-in movement stories |
 | `compare` | Same bytes into Traccar **and** our ingest, then diff the decodes |
+| `panel` | Browser scenario picker — same code as `stream`, a Run button instead of flags |
 
 Flags override `device.conf` without editing it:
 
