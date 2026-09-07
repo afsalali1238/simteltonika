@@ -39,7 +39,14 @@ Nothing else. This package has zero dependencies.
 
 ### 2. Clone and prove it works
 
+Clone into a normal working directory you can write to — **not**
+`C:\Windows\System32`, `C:\Program Files`, or any folder your shell happens
+to default into. A fresh terminal on Windows can open in `System32`, and
+`git clone` there fails with "Permission denied," which cascades into every
+step after it. If unsure, `cd` into your home folder or Desktop first:
+
 ```bash
+cd ~/Desktop    # or wherever you keep projects
 git clone https://github.com/afsalali1238/simteltonika.git
 cd simteltonika
 npm test
